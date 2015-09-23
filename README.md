@@ -15,3 +15,17 @@ hitting the network at all.
 node_modules may contain compiled/binary files and npmi should only
 be run in the same environment as the actual code to prevent nasty
 surprises.
+
+# Usage
+
+```
+$ npmi -h
+
+NPMI - a caching 'npm install'
+
+Usage: ./npmi [-hv]
+-h    Display this help
+-c    Use specified cache dir: Default $TMPDIR/npmi
+-v    Verbose output
+
+```
