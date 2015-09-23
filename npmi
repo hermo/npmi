@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+
+CACHEDIR="$TMPDIR/npmi"
+
+VERBOSE=0
+
+
+usage() {
+    echo -e "NPMI - a caching 'npm install'\n"
+    echo "Usage: $0 [-hv]"
+    echo "-h    Display this help"
+    echo "-c    Use specified cache dir: Default \$TMPDIR/npmi"
+    echo "-v    Verbose output"
+}
+
+while getopts 'hc:v' OPTION; do
+    case $OPTION in
+        h)
+            usage
+            exit 1
+            ;;
+        c)
+            if [ ! -d "$OPTARG" ]; then
+                echo "ERROR: Specified cache dir $OPTARG does not exist"
+                exit 1
+            fi
+            CACHEDIR="$OPTARG"
+            ;;
+        v)
+            VERBOSE=1
+            ;;
+    esac
+done
+
+vecho() {
+    test $VERBOSE -eq 1 && echo $*
+}
+
+sanitycheck() {
+    if [ ! -d "$CACHEDIR" ]; then
+        if ! mkdir "$CACHEDIR"; then
+            echo "ERROR: Can't create cache directory $CACHEDIR"
+            exit 1
+        fi
+    fi
+
+    BINS="cut tar md5sum npm"
+    for bin in $BINS; do
+        if ! which "$bin" > /dev/null 2>&1 ; then
+            echo "ERROR: Binary $bin not found"
+            exit 1
+        fi
+    done
+}
+
+get_hash() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        HASH=$(md5sum $file | cut -c1-32)
+    else
+        return 1
+    fi
+}
+
+determine_hash() {
+    HASH_SOURCES='npm-shrinkwrap.json package.json'
+
+    for HASH_SOURCE in $HASH_SOURCES; do
+        get_hash "$HASH_SOURCE" && break
+    done
+}
+
+remove_modules() {
+    if [ -d "node_modules" ]; then
+        rm -rf node_modules
+    fi
+}
+
+install_from_cache() {
+    local cachefile="$1"
+
+    if [ -f "$cachefile" ]; then
+        tar xfz "$cachefile"
+        if [ $? -eq 0 ]; then
+            return 0
+        else
+            return 2
+        fi
+    else
+        return 1
+    fi
+}
+
+install_from_npm() {
+    npm install --loglevel error 2>&1 >/dev/null
+    return $?
+}
+
+store_to_cache() {
+    local cachefile="$1"
+
+    tar cfz "$cachefile" node_modules
+    if [ $? -ne 0 ]; then
+        rm -f "$cachefile"
+        return 1
+    fi
+}
+
+
+# Make sure everything is good to go
+sanitycheck
+
+# Sets HASH, HASH_SOURCE
+determine_hash
+if [ -z "$HASH" ]; then
+    echo "ERROR: Can't find npm-shrinkwrap.json/package.json"
+    exit 1
+fi
+
+CACHEFILE="$CACHEDIR/$HASH.tgz"
+vecho "- HASH ${HASH} determined from ${HASH_SOURCE}"
+
+vecho "- Cleaning node_modules..."
+if ! remove_modules; then
+    echo "ERROR: Cannot remove node_modules"
+    exit 2
+fi
+
+vecho "- Attempt to install from cache"
+install_from_cache "$CACHEFILE"
+case $? in
+    0)
+        vecho "- Modules installed successfully"
+        exit 0
+        ;;
+    1)
+        vecho "- Modules not found in cache"
+        ;;
+    *)
+        echo "ERROR: Install from cache failed"
+        exit 2
+        ;;
+esac
+
+vecho "- Installing modules from NPM"
+if ! install_from_npm; then
+    echo "ERROR: NPM install failed"
+    exit 2
+fi
+
+if store_to_cache "$CACHEFILE"; then
+    vecho "- Modules cached successfully"
+else
+    vecho "ERROR: tar command failed..."
+    exit 2
+fi
