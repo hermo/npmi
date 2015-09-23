@@ -7,7 +7,7 @@ VERBOSE=0
 
 usage() {
     echo -e "NPMI - a caching 'npm install'\n"
-    echo "Usage: $0 [-hv]"
+    echo "Usage: $0 [-hcv]"
     echo "-h    Display this help"
     echo "-c    Use specified cache dir: Default \$TMPDIR/npmi"
     echo "-v    Verbose output"

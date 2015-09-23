@@ -23,7 +23,7 @@ $ npmi -h
 
 NPMI - a caching 'npm install'
 
-Usage: ./npmi [-hv]
+Usage: ./npmi [-hcv]
 -h    Display this help
 -c    Use specified cache dir: Default $TMPDIR/npmi
 -v    Verbose output
