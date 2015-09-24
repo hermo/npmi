@@ -7,17 +7,18 @@ fi
 CACHEDIR="$TMPDIR/npmi"
 
 VERBOSE=0
-
+FORCE=0
 
 usage() {
     echo -e "NPMI - a caching 'npm install'\n"
-    echo "Usage: $0 [-hcv]"
+    echo "Usage: $0 [-hcfv]"
     echo "-h    Display this help"
     echo "-c    Use specified cache dir: Default \$TMPDIR/npmi"
+    echo "-f    Force install from NPM and update cache"
     echo "-v    Verbose output"
 }
 
-while getopts 'hc:v' OPTION; do
+while getopts 'hc:fv' OPTION; do
     case $OPTION in
         h)
             usage
@@ -29,6 +30,9 @@ while getopts 'hc:v' OPTION; do
                 exit 1
             fi
             CACHEDIR="$OPTARG"
+            ;;
+        f)
+            FORCE=1
             ;;
         v)
             VERBOSE=1
@@ -130,31 +134,45 @@ if ! remove_modules; then
     exit 2
 fi
 
-vecho "- Attempt to install from cache"
-install_from_cache "$CACHEFILE"
-case $? in
-    0)
-        vecho "- Modules installed successfully"
-        exit 0
-        ;;
-    1)
-        vecho "- Modules not found in cache"
-        ;;
-    *)
-        echo "ERROR: Install from cache failed"
-        exit 2
-        ;;
-esac
+if [ $FORCE -eq 0 ]; then
+    vecho "- Attempt to install from cache"
+    install_from_cache "$CACHEFILE"
+    case $? in
+        0)
+            vecho "- Modules installed successfully"
+            exit 0
+            ;;
+        1)
+            vecho "- Modules not found in cache"
+            ;;
+        *)
+            echo "ERROR: Install from cache failed"
+            exit 2
+            ;;
+    esac
+    vecho "- Installing modules from NPM"
+else
+    vecho "- FORCE: Installing modules from NPM"
+fi
 
-vecho "- Installing modules from NPM"
 if ! install_from_npm; then
     echo "ERROR: NPM install failed"
     exit 2
 fi
 
+if [ $FORCE -eq 1 ]; then
+    if [ -f "$CACHEFILE" ]; then
+        vecho "- FORCE: Remove existing cache file"
+        if ! rm "$CACHEFILE"; then
+            echo "ERROR: Could not remove cache file"
+            exit 2
+        fi
+    fi
+fi
+
 if store_to_cache "$CACHEFILE"; then
     vecho "- Modules cached successfully"
 else
-    vecho "ERROR: tar command failed..."
+    echo "ERROR: tar command failed..."
     exit 2
 fi
