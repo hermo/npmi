@@ -21,11 +21,11 @@ surprises.
 ```
 $ npmi -h
 
-NPMI - a caching 'npm install'
+NPMI v1.0.0 - a caching 'npm install'
 
-Usage: ./npmi [-hcv]
+Usage: ./npmi [-hcfv]
 -h    Display this help
 -c    Use specified cache dir: Default $TMPDIR/npmi
+-f    Force install from NPM and update cache
 -v    Verbose output
-
 ```
