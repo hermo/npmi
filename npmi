@@ -9,6 +9,7 @@ CACHEDIR="$TMPDIR/npmi"
 VERSION="1.0.0"
 VERBOSE=0
 FORCE=0
+CACHE_EXISTING=0
 
 
 usage() {
@@ -16,11 +17,12 @@ usage() {
     echo "Usage: $0 [-hcfv]"
     echo "-h    Display this help"
     echo "-c    Use specified cache dir: Default \$TMPDIR/npmi"
+    echo "-e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode"
     echo "-f    Force install from NPM and update cache"
     echo "-v    Verbose output"
 }
 
-while getopts 'hc:fv' OPTION; do
+while getopts 'hc:efv' OPTION; do
     case $OPTION in
         h)
             usage
@@ -32,6 +34,9 @@ while getopts 'hc:fv' OPTION; do
                 exit 1
             fi
             CACHEDIR="$OPTARG"
+            ;;
+        e)
+            CACHE_EXISTING=1
             ;;
         f)
             FORCE=1
@@ -129,6 +134,16 @@ fi
 
 CACHEFILE="$CACHEDIR/$HASH.tgz"
 vecho "- HASH ${HASH} determined from ${HASH_SOURCE}"
+
+if [ $CACHE_EXISTING -eq 1 ]; then
+    if store_to_cache "$CACHEFILE"; then
+        vecho "- Modules cached successfully"
+        exit 0
+    else
+        echo "ERROR: tar command failed..."
+        exit 2
+    fi
+fi
 
 vecho "- Cleaning node_modules..."
 if ! remove_modules; then
