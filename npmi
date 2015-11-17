@@ -59,7 +59,7 @@ sanitycheck() {
         fi
     fi
 
-    BINS="cut tar md5sum npm"
+    BINS="cut tar md5sum node npm"
     for bin in $BINS; do
         if ! which "$bin" > /dev/null 2>&1 ; then
             echo "ERROR: Binary $bin not found"
@@ -125,6 +125,13 @@ store_to_cache() {
 # Make sure everything is good to go
 sanitycheck
 
+PREFIX=$(node -p 'process.version + "-" + process.platform + "-" + process.arch')
+
+if [ $? -ne 0 ]; then
+    echo "ERROR: Cannot determine node platform prefix"
+    exit 2
+fi
+
 # Sets HASH, HASH_SOURCE
 determine_hash
 if [ -z "$HASH" ]; then
@@ -132,8 +139,8 @@ if [ -z "$HASH" ]; then
     exit 1
 fi
 
-CACHEFILE="$CACHEDIR/$HASH.tgz"
-vecho "- HASH ${HASH} determined from ${HASH_SOURCE}"
+CACHEFILE="$CACHEDIR/$PREFIX-$HASH.tgz"
+vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${PREFIX})"
 
 if [ $CACHE_EXISTING -eq 1 ]; then
     if store_to_cache "$CACHEFILE"; then
