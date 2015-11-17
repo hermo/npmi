@@ -3,6 +3,7 @@ Locally caching 'npm install'. Useful in CI-like situations.
 
 npmi works by hashing npm-shrinkwrap.json / package.json to get a
 reasonably unique id and using that as a cache key.
+The cache key is prefixed with node version, platform and arch.
 
 On the first run npmi will run 'npm install' as usual, storing whatever
 ends up in node_modules to $CACHEDIR/$HASH.tgz.
@@ -21,11 +22,12 @@ surprises.
 ```
 $ npmi -h
 
-NPMI v1.0.0 - a caching 'npm install'
+NPMI v2.0.0 - a caching 'npm install'
 
 Usage: ./npmi [-hcfv]
 -h    Display this help
 -c    Use specified cache dir: Default $TMPDIR/npmi
+-e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
 -f    Force install from NPM and update cache
 -v    Verbose output
 ```
@@ -57,7 +59,7 @@ $ rm -rf node_modules && time npm install
 Install with NPMI
 ```
 $ npmi -v
-# - HASH e3102336c4165f1ca58ef03f09e1a9fd determined from package.json
+# - HASH e3102336c4165f1ca58ef03f09e1a9fd determined from package.json (v4.2.1-darwin-x64)
 # - Cleaning node_modules...
 # - Attempt to install from cache
 # - Modules not found in cache
@@ -68,7 +70,7 @@ $ npmi -v
 Install from NPMI cache
 ```
 $ time npmi -v
-# - HASH e3102336c4165f1ca58ef03f09e1a9fd determined from package.json
+# - HASH e3102336c4165f1ca58ef03f09e1a9fd determined from package.json (v4.2.1-darwin-x64)
 # - Cleaning node_modules...
 # - Attempt to install from cache
 # - Modules installed successfully
