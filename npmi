@@ -59,19 +59,30 @@ sanitycheck() {
         fi
     fi
 
-    BINS="cut tar md5sum node npm"
+    BINS="cut tar node npm"
     for bin in $BINS; do
         if ! which "$bin" > /dev/null 2>&1 ; then
             echo "ERROR: Binary $bin not found"
             exit 1
         fi
     done
+
+    if which "md5sum" > /dev/null 2>&1 ; then
+        MD5SUM="md5sum"
+    elif which "gmd5sum" > /dev/null 2>&1 ; then
+        MD5SUM="gmd5sum"
+    elif which "md5" > /dev/null 2>&1 ; then
+        MD5SUM="md5 -q"
+    else
+        echo "ERROR: md5sum or md5 binary not found"
+        exit 1
+    fi
 }
 
 get_hash() {
     local file="$1"
     if [ -f "$file" ]; then
-        HASH=$(md5sum $file | cut -c1-32)
+        HASH=$($MD5SUM $file | cut -c1-32)
     else
         return 1
     fi
