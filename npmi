@@ -49,6 +49,7 @@ done
 
 vecho() {
     test $VERBOSE -eq 1 && echo $*
+    return 0
 }
 
 sanitycheck() {
