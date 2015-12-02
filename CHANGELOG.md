@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2015-12-02
+### Fixed
+- When running NPMI non-verbosely it incorrectly returned 1 instead of 0
+  after successfully storing modules.
+
 ## [2.1.0] - 2015-12-01
 ### Added
 - Add support for MD5 hashing using BSD/Mac OS X md5 and g-prefixed md5sum
@@ -30,3 +35,4 @@ useful when working with multiple node versions, operating systems etc.
 [1.0.0]: https://github.com/hermo/npmi/releases/tag/v1.0.0
 [2.0.0]: https://github.com/hermo/npmi/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/hermo/npmi/compare/v2.0.0...v2.1.0
+[2.1.1]: https://github.com/hermo/npmi/compare/v2.1.0...v2.1.1
