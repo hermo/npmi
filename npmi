@@ -101,7 +101,7 @@ sanitycheck() {
 get_hash() {
     local file="$1"
     if [ -f "$file" ]; then
-        HASH=$($MD5SUM $file | cut -c1-32)
+        HASH=$("$MD5SUM" "$file" | cut -c1-32)
     else
         return 1
     fi
@@ -187,7 +187,8 @@ store_to_cache() {
 }
 
 main() {
-    PREFIX=$(node -p 'process.version + "-" + process.platform + "-" + process.arch')
+    local platform
+    platform=$(node -p 'process.version + "-" + process.platform + "-" + process.arch')
 
     if [ $? -ne 0 ]; then
         echo "ERROR: Cannot determine node platform prefix"
@@ -201,15 +202,15 @@ main() {
         exit 1
     fi
 
-    KEY="$PREFIX-$HASH"
-    CACHEFILE="$CACHEDIR/$KEY.tgz"
-    vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${KEY})"
+    local cache_key="$platform-$HASH"
+    local cache_file="$CACHEDIR/$cache_key.tgz"
+    vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${cache_key})"
 
     if [ $CACHE_EXISTING -eq 1 ]; then
-        if store_to_cache "$CACHEFILE"; then
+        if store_to_cache "$cache_file"; then
             vecho "- Modules cached successfully"
             if [ -n "$REDIS_SERVER" ]; then
-                if store_to_redis "$REDIS_SERVER" "$KEY" "$CACHEFILE"; then
+                if store_to_redis "$REDIS_SERVER" "$cache_key" "$cache_file"; then
                     vecho "- Stored to redis successfully"
                     exit 0
                 else
@@ -231,7 +232,7 @@ main() {
 
     if [ $FORCE -eq 0 ]; then
         vecho "- Attempt to install from cache"
-        install_from_cache "$CACHEFILE" "$KEY"
+        install_from_cache "$cache_file" "$cache_key"
         case $? in
             0)
                 vecho "- Modules installed successfully"
@@ -256,16 +257,16 @@ main() {
     fi
 
     if [ $FORCE -eq 1 ]; then
-        if [ -f "$CACHEFILE" ]; then
+        if [ -f "$cache_file" ]; then
             vecho "- FORCE: Remove existing cache file"
-            if ! rm "$CACHEFILE"; then
+            if ! rm "$cache_file"; then
                 echo "ERROR: Could not remove cache file"
                 exit 2
             fi
         fi
     fi
 
-    if store_to_cache "$CACHEFILE"; then
+    if store_to_cache "$cache_file"; then
         vecho "- Modules cached successfully"
     else
         echo "ERROR: tar command failed..."
@@ -273,7 +274,7 @@ main() {
     fi
 
     if [ -n "$REDIS_SERVER" ]; then
-        if store_to_redis "$REDIS_SERVER" "$KEY" "$CACHEFILE"; then
+        if store_to_redis "$REDIS_SERVER" "$cache_key" "$cache_file"; then
             exit 0
         else
             echo "ERROR: Redis store failed..."
