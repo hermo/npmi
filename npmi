@@ -10,6 +10,7 @@ VERSION="2.1.1"
 VERBOSE=0
 FORCE=0
 CACHE_EXISTING=0
+REDIS=""
 
 
 usage() {
@@ -19,10 +20,11 @@ usage() {
     echo "-c    Use specified cache dir: Default \$TMPDIR/npmi"
     echo "-e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode"
     echo "-f    Force install from NPM and update cache"
+    echo "-r    Use specified redis server for shared cache"
     echo "-v    Verbose output"
 }
 
-while getopts 'hc:efv' OPTION; do
+while getopts 'hc:efvr:' OPTION; do
     case $OPTION in
         h)
             usage
@@ -44,6 +46,9 @@ while getopts 'hc:efv' OPTION; do
         v)
             VERBOSE=1
             ;;
+        r)
+            REDIS="$OPTARG"
+            ;;
     esac
 done
 
@@ -60,8 +65,12 @@ sanitycheck() {
         fi
     fi
 
-    BINS="cut tar node npm"
-    for bin in $BINS; do
+    local bins=(cut tar node npm)
+    if [ -n "$REDIS" ]; then
+        bins+=(redis-cli)
+    fi
+
+    for bin in "${bins[@]}"; do
         if ! which "$bin" > /dev/null 2>&1 ; then
             echo "ERROR: Binary $bin not found"
             exit 1
@@ -103,8 +112,43 @@ remove_modules() {
     fi
 }
 
+fetch_from_redis() {
+    local host="$1"
+    local key="$2"
+    local dstfile="$3"
+    local tempfile="$(mktemp)"
+    redis-cli --raw -h "$host" HGET NPMI3 "$key" > "$tempfile"
+
+    if [ $(wc -c < "$tempfile") -ge 10 ]; then
+        mv "$tempfile" "$dstfile"
+        vecho "- Redis lookup HIT"
+        return 0
+    else
+        vecho "- Redis lookup MISS"
+        rm "$tempfile"
+        return 1
+    fi
+}
+
+store_to_redis() {
+    local host="$1"
+    local key="$2"
+    local srcfile="$3"
+    if redis-cli -x --raw -h "$host" HSET NPMI3 "$key" < "$srcfile" >/dev/null; then
+        vecho "- Store to redis OK"
+        return 0
+        vecho "- Store to redis FAIL"
+        return 1
+    fi
+}
+
 install_from_cache() {
     local cachefile="$1"
+    local key="$2"
+
+    if [ -n "$REDIS" ] && [ ! -f "$cachefile" ]; then
+        fetch_from_redis "$REDIS" "$key" "$cachefile"
+    fi
 
     if [ -f "$cachefile" ]; then
         tar xfz "$cachefile"
@@ -151,13 +195,23 @@ if [ -z "$HASH" ]; then
     exit 1
 fi
 
-CACHEFILE="$CACHEDIR/$PREFIX-$HASH.tgz"
-vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${PREFIX})"
+KEY="$PREFIX-$HASH"
+CACHEFILE="$CACHEDIR/$KEY.tgz"
+echo $CACHEFILE
+vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${KEY})"
 
 if [ $CACHE_EXISTING -eq 1 ]; then
     if store_to_cache "$CACHEFILE"; then
         vecho "- Modules cached successfully"
-        exit 0
+        if [ -n "$REDIS" ]; then
+            if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
+                vecho "- Stored to redis successfully"
+                exit 0
+            else
+                echo "ERROR: Redis store failed..."
+                exit 2
+            fi
+        fi
     else
         echo "ERROR: tar command failed..."
         exit 2
@@ -172,7 +226,7 @@ fi
 
 if [ $FORCE -eq 0 ]; then
     vecho "- Attempt to install from cache"
-    install_from_cache "$CACHEFILE"
+    install_from_cache "$CACHEFILE" "$KEY"
     case $? in
         0)
             vecho "- Modules installed successfully"
@@ -211,4 +265,13 @@ if store_to_cache "$CACHEFILE"; then
 else
     echo "ERROR: tar command failed..."
     exit 2
+fi
+
+if [ -n "$REDIS" ]; then
+    if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
+        exit 0
+    else
+        echo "ERROR: Redis store failed..."
+        exit 2
+    fi
 fi
