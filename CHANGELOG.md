@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2015-12-16
+### Added
+- Add support for storing cached files in redis
+
 ## [2.1.1] - 2015-12-02
 ### Fixed
 - When running NPMI non-verbosely it incorrectly returned 1 instead of 0
@@ -36,3 +40,4 @@ useful when working with multiple node versions, operating systems etc.
 [2.0.0]: https://github.com/hermo/npmi/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/hermo/npmi/compare/v2.0.0...v2.1.0
 [2.1.1]: https://github.com/hermo/npmi/compare/v2.1.0...v2.1.1
+[3.0.0]: https://github.com/hermo/npmi/compare/v2.1.1...v3.0.0

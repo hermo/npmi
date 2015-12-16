@@ -11,6 +11,8 @@ ends up in node_modules to $CACHEDIR/$HASH.tgz.
 Later npmi will simply extract node_modules from the cache without
 hitting the network at all.
 
+It can also use a Redis server to share cached files between hosts.
+
 # NOTE
 
 node_modules may contain compiled/binary files and npmi should only
@@ -22,13 +24,14 @@ surprises.
 ```
 $ npmi -h
 
-NPMI v2.0.0 - a caching 'npm install'
+NPMI v3.0.0 - a caching 'npm install'
 
 Usage: ./npmi [-hcfv]
 -h    Display this help
 -c    Use specified cache dir: Default $TMPDIR/npmi
 -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
 -f    Force install from NPM and update cache
+-r    Use specified redis server for shared cache
 -v    Verbose output
 ```
 
