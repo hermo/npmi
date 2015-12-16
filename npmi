@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -eu
+set -o pipefail
+
 if [ -z "$TMPDIR" ]; then
     TMPDIR="/tmp"
 fi
