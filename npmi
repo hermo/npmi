@@ -12,7 +12,7 @@ CACHEDIR="$TMPDIR/npmi"
 VERBOSE=0
 FORCE=0
 CACHE_EXISTING=0
-REDIS=""
+REDIS_SERVER=""
 
 format_heredoc() {
     awk 'NR==1 && match($0, /^ +/){n=RLENGTH} {print substr($0, n+1)}'
@@ -55,7 +55,7 @@ parse_args() {
                 VERBOSE=1
                 ;;
             r)
-                REDIS="$OPTARG"
+                REDIS_SERVER="$OPTARG"
                 ;;
         esac
     done
@@ -75,7 +75,7 @@ sanitycheck() {
     fi
 
     local bins=(cut tar node npm awk)
-    if [ -n "$REDIS" ]; then
+    if [ -n "$REDIS_SERVER" ]; then
         bins+=(redis-cli)
     fi
 
@@ -155,8 +155,8 @@ install_from_cache() {
     local cachefile="$1"
     local key="$2"
 
-    if [ -n "$REDIS" ] && [ ! -f "$cachefile" ]; then
-        fetch_from_redis "$REDIS" "$key" "$cachefile"
+    if [ -n "$REDIS_SERVER" ] && [ ! -f "$cachefile" ]; then
+        fetch_from_redis "$REDIS_SERVER" "$key" "$cachefile"
     fi
 
     if [ -f "$cachefile" ]; then
@@ -208,8 +208,8 @@ main() {
     if [ $CACHE_EXISTING -eq 1 ]; then
         if store_to_cache "$CACHEFILE"; then
             vecho "- Modules cached successfully"
-            if [ -n "$REDIS" ]; then
-                if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
+            if [ -n "$REDIS_SERVER" ]; then
+                if store_to_redis "$REDIS_SERVER" "$KEY" "$CACHEFILE"; then
                     vecho "- Stored to redis successfully"
                     exit 0
                 else
@@ -272,8 +272,8 @@ main() {
         exit 2
     fi
 
-    if [ -n "$REDIS" ]; then
-        if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
+    if [ -n "$REDIS_SERVER" ]; then
+        if store_to_redis "$REDIS_SERVER" "$KEY" "$CACHEFILE"; then
             exit 0
         else
             echo "ERROR: Redis store failed..."
