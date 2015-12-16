@@ -14,45 +14,52 @@ FORCE=0
 CACHE_EXISTING=0
 REDIS=""
 
-
-usage() {
-    echo -e "NPMI v${VERSION} - a caching 'npm install'\n"
-    echo "Usage: $0 [-hcfv]"
-    echo "-h    Display this help"
-    echo "-c    Use specified cache dir: Default \$TMPDIR/npmi"
-    echo "-e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode"
-    echo "-f    Force install from NPM and update cache"
-    echo "-r    Use specified redis server for shared cache"
-    echo "-v    Verbose output"
+format_heredoc() {
+    awk 'NR==1 && match($0, /^ +/){n=RLENGTH} {print substr($0, n+1)}'
 }
 
-while getopts 'hc:efvr:' OPTION; do
-    case $OPTION in
-        h)
-            usage
-            exit 1
-            ;;
-        c)
-            if [ ! -d "$OPTARG" ]; then
-                echo "ERROR: Specified cache dir $OPTARG does not exist"
+usage() {
+    cat <<- EOF | format_heredoc
+        NPMI v${VERSION} - a caching 'npm install'
+        Usage: $0 [-hcfv]
+        -h    Display this help"
+        -c    Use specified cache dir: Default $TMPDIR/npmi
+        -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
+        -f    Force install from NPM and update cache
+        -r    Use specified redis server for shared cache
+        -v    Verbose output
+EOF
+}
+
+parse_args() {
+    while getopts 'hc:efvr:' OPTION; do
+        case $OPTION in
+            h)
+                usage
                 exit 1
-            fi
-            CACHEDIR="$OPTARG"
-            ;;
-        e)
-            CACHE_EXISTING=1
-            ;;
-        f)
-            FORCE=1
-            ;;
-        v)
-            VERBOSE=1
-            ;;
-        r)
-            REDIS="$OPTARG"
-            ;;
-    esac
-done
+                ;;
+            c)
+                if [ ! -d "$OPTARG" ]; then
+                    echo "ERROR: Specified cache dir $OPTARG does not exist"
+                    exit 1
+                fi
+                CACHEDIR="$OPTARG"
+                ;;
+            e)
+                CACHE_EXISTING=1
+                ;;
+            f)
+                FORCE=1
+                ;;
+            v)
+                VERBOSE=1
+                ;;
+            r)
+                REDIS="$OPTARG"
+                ;;
+        esac
+    done
+}
 
 vecho() {
     test $VERBOSE -eq 1 && echo $*
@@ -67,7 +74,7 @@ sanitycheck() {
         fi
     fi
 
-    local bins=(cut tar node npm)
+    local bins=(cut tar node npm awk)
     if [ -n "$REDIS" ]; then
         bins+=(redis-cli)
     fi
@@ -179,100 +186,106 @@ store_to_cache() {
     fi
 }
 
+main() {
+    PREFIX=$(node -p 'process.version + "-" + process.platform + "-" + process.arch')
 
-# Make sure everything is good to go
-sanitycheck
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Cannot determine node platform prefix"
+        exit 2
+    fi
 
-PREFIX=$(node -p 'process.version + "-" + process.platform + "-" + process.arch')
+    # Sets HASH, HASH_SOURCE
+    determine_hash
+    if [ -z "$HASH" ]; then
+        echo "ERROR: Can't find npm-shrinkwrap.json/package.json"
+        exit 1
+    fi
 
-if [ $? -ne 0 ]; then
-    echo "ERROR: Cannot determine node platform prefix"
-    exit 2
-fi
+    KEY="$PREFIX-$HASH"
+    CACHEFILE="$CACHEDIR/$KEY.tgz"
+    vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${KEY})"
 
-# Sets HASH, HASH_SOURCE
-determine_hash
-if [ -z "$HASH" ]; then
-    echo "ERROR: Can't find npm-shrinkwrap.json/package.json"
-    exit 1
-fi
+    if [ $CACHE_EXISTING -eq 1 ]; then
+        if store_to_cache "$CACHEFILE"; then
+            vecho "- Modules cached successfully"
+            if [ -n "$REDIS" ]; then
+                if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
+                    vecho "- Stored to redis successfully"
+                    exit 0
+                else
+                    echo "ERROR: Redis store failed..."
+                    exit 2
+                fi
+            fi
+        else
+            echo "ERROR: tar command failed..."
+            exit 2
+        fi
+    fi
 
-KEY="$PREFIX-$HASH"
-CACHEFILE="$CACHEDIR/$KEY.tgz"
-vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${KEY})"
+    vecho "- Cleaning node_modules..."
+    if ! remove_modules; then
+        echo "ERROR: Cannot remove node_modules"
+        exit 2
+    fi
 
-if [ $CACHE_EXISTING -eq 1 ]; then
-    if store_to_cache "$CACHEFILE"; then
-        vecho "- Modules cached successfully"
-        if [ -n "$REDIS" ]; then
-            if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
-                vecho "- Stored to redis successfully"
+    if [ $FORCE -eq 0 ]; then
+        vecho "- Attempt to install from cache"
+        install_from_cache "$CACHEFILE" "$KEY"
+        case $? in
+            0)
+                vecho "- Modules installed successfully"
                 exit 0
-            else
-                echo "ERROR: Redis store failed..."
+                ;;
+            1)
+                vecho "- Modules not found in cache"
+                ;;
+            *)
+                echo "ERROR: Install from cache failed"
+                exit 2
+                ;;
+        esac
+        vecho "- Installing modules from NPM"
+    else
+        vecho "- FORCE: Installing modules from NPM"
+    fi
+
+    if ! install_from_npm; then
+        echo "ERROR: NPM install failed"
+        exit 2
+    fi
+
+    if [ $FORCE -eq 1 ]; then
+        if [ -f "$CACHEFILE" ]; then
+            vecho "- FORCE: Remove existing cache file"
+            if ! rm "$CACHEFILE"; then
+                echo "ERROR: Could not remove cache file"
                 exit 2
             fi
         fi
+    fi
+
+    if store_to_cache "$CACHEFILE"; then
+        vecho "- Modules cached successfully"
     else
         echo "ERROR: tar command failed..."
         exit 2
     fi
-fi
 
-vecho "- Cleaning node_modules..."
-if ! remove_modules; then
-    echo "ERROR: Cannot remove node_modules"
-    exit 2
-fi
-
-if [ $FORCE -eq 0 ]; then
-    vecho "- Attempt to install from cache"
-    install_from_cache "$CACHEFILE" "$KEY"
-    case $? in
-        0)
-            vecho "- Modules installed successfully"
+    if [ -n "$REDIS" ]; then
+        if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
             exit 0
-            ;;
-        1)
-            vecho "- Modules not found in cache"
-            ;;
-        *)
-            echo "ERROR: Install from cache failed"
-            exit 2
-            ;;
-    esac
-    vecho "- Installing modules from NPM"
-else
-    vecho "- FORCE: Installing modules from NPM"
-fi
-
-if ! install_from_npm; then
-    echo "ERROR: NPM install failed"
-    exit 2
-fi
-
-if [ $FORCE -eq 1 ]; then
-    if [ -f "$CACHEFILE" ]; then
-        vecho "- FORCE: Remove existing cache file"
-        if ! rm "$CACHEFILE"; then
-            echo "ERROR: Could not remove cache file"
+        else
+            echo "ERROR: Redis store failed..."
             exit 2
         fi
     fi
-fi
+}
 
-if store_to_cache "$CACHEFILE"; then
-    vecho "- Modules cached successfully"
-else
-    echo "ERROR: tar command failed..."
-    exit 2
-fi
 
-if [ -n "$REDIS" ]; then
-    if store_to_redis "$REDIS" "$KEY" "$CACHEFILE"; then
-        exit 0
-    else
-        echo "ERROR: Redis store failed..."
-        exit 2
-    fi
-fi
+parse_args $@
+
+# Make sure everything is good to go
+sanitycheck
+
+main
