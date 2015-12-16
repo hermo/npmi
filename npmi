@@ -4,9 +4,8 @@ if [ -z "$TMPDIR" ]; then
     TMPDIR="/tmp"
 fi
 
+readonly VERSION="3.0.0"
 CACHEDIR="$TMPDIR/npmi"
-
-VERSION="2.1.1"
 VERBOSE=0
 FORCE=0
 CACHE_EXISTING=0
