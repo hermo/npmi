@@ -196,7 +196,6 @@ fi
 
 KEY="$PREFIX-$HASH"
 CACHEFILE="$CACHEDIR/$KEY.tgz"
-echo $CACHEFILE
 vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${KEY})"
 
 if [ $CACHE_EXISTING -eq 1 ]; then
