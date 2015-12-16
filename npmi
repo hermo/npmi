@@ -62,7 +62,7 @@ parse_args() {
 }
 
 vecho() {
-    test $VERBOSE -eq 1 && echo $*
+    test $VERBOSE -eq 1 && echo "$*"
     return 0
 }
 
@@ -125,10 +125,14 @@ fetch_from_redis() {
     local host="$1"
     local key="$2"
     local dstfile="$3"
-    local tempfile="$(mktemp)"
+    local tempfile
+    tempfile="$(mktemp)"
     redis-cli --raw -h "$host" HGET NPMI3 "$key" > "$tempfile"
 
-    if [ $(wc -c < "$tempfile") -ge 10 ]; then
+    local templen
+    templen="$(wc -c < "$tempfile")"
+
+    if [ "$templen" -ge 10 ]; then
         mv "$tempfile" "$dstfile"
         vecho "- Redis lookup HIT"
         return 0
@@ -172,7 +176,7 @@ install_from_cache() {
 }
 
 install_from_npm() {
-    npm install --loglevel error 2>&1 >/dev/null
+    npm install --loglevel error >/dev/null 2>&1
     return $?
 }
 
@@ -284,7 +288,7 @@ main() {
 }
 
 
-parse_args $@
+parse_args "$@"
 
 # Make sure everything is good to go
 sanitycheck
