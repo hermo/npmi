@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.2] - 2015-12-17
+### Fixed
+- Use "-o nounset" compatible TMPDIR declaration detection
+
 ## [3.0.1] - 2015-12-17
 ### Changed
 - Improved error handling
@@ -48,3 +52,4 @@ useful when working with multiple node versions, operating systems etc.
 [2.1.1]: https://github.com/hermo/npmi/compare/v2.1.0...v2.1.1
 [3.0.0]: https://github.com/hermo/npmi/compare/v2.1.1...v3.0.0
 [3.0.1]: https://github.com/hermo/npmi/compare/v3.0.0...v3.0.1
+[3.0.2]: https://github.com/hermo/npmi/compare/v3.0.1...v3.0.2
