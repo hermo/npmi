@@ -201,7 +201,7 @@ main() {
 
     # Sets HASH, HASH_SOURCE
     determine_hash
-    if [ -z "$HASH" ]; then
+    if [[ ! ${HASH+_} ]]; then
         echo "ERROR: Can't find npm-shrinkwrap.json/package.json"
         exit 1
     fi
