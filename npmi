@@ -3,7 +3,7 @@
 set -eu
 set -o pipefail
 
-if [ -z "$TMPDIR" ]; then
+if [[ ! ${TMPDIR+_} ]]; then
     TMPDIR="/tmp"
 fi
 
