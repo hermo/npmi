@@ -2,7 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [3.0.2] - 2015-12-17
+## [3.0.3] - 2015-12-18
+## Fixed
+- It works again. The previous release was quite broken after enabling
+  "-o errexit" even though everything looked ok.
+- Check HASH declaration safely
+
+## 3.0.2 - 2015-12-18 [YANKED]
 ### Fixed
 - Use "-o nounset" compatible TMPDIR declaration detection
 
@@ -52,4 +58,4 @@ useful when working with multiple node versions, operating systems etc.
 [2.1.1]: https://github.com/hermo/npmi/compare/v2.1.0...v2.1.1
 [3.0.0]: https://github.com/hermo/npmi/compare/v2.1.1...v3.0.0
 [3.0.1]: https://github.com/hermo/npmi/compare/v3.0.0...v3.0.1
-[3.0.2]: https://github.com/hermo/npmi/compare/v3.0.1...v3.0.2
+[3.0.3]: https://github.com/hermo/npmi/compare/v3.0.1...v3.0.3
