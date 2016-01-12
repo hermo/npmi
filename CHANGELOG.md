@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.0] - 2016-01-12
+## Added
+- Configuration file support. If an .npmirc file is found in the working
+  directory it will be parsed for configuration options. See the [README]
+  for details.
+
+## Changed
+- Redis cache now uses SETEX instead of HSET. This means that old entries will
+  automatically be cleared from redis after a specified time. Default is 24
+  hours.
+
 ## [3.0.3] - 2015-12-18
 ## Fixed
 - It works again. The previous release was quite broken after enabling
@@ -52,6 +63,7 @@ useful when working with multiple node versions, operating systems etc.
 - First versioned release
 - (-f) Force update even if cache exists
 
+[README]: "README.md"
 [1.0.0]: https://github.com/hermo/npmi/releases/tag/v1.0.0
 [2.0.0]: https://github.com/hermo/npmi/compare/v1.0.0...v2.0.0
 [2.1.0]: https://github.com/hermo/npmi/compare/v2.0.0...v2.1.0
@@ -59,3 +71,4 @@ useful when working with multiple node versions, operating systems etc.
 [3.0.0]: https://github.com/hermo/npmi/compare/v2.1.1...v3.0.0
 [3.0.1]: https://github.com/hermo/npmi/compare/v3.0.0...v3.0.1
 [3.0.3]: https://github.com/hermo/npmi/compare/v3.0.1...v3.0.3
+[4.0.0]: https://github.com/hermo/npmi/compare/v3.0.3...v4.0.0
