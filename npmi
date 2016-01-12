@@ -29,7 +29,7 @@ usage() {
         -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
         -f    Force install from NPM and update cache
         -r    Use specified Redis server for shared cache
-        -t    Specify Redis TTL in seconds. Default: 86400 (24 hours)
+        -t    Specify Redis TTL in seconds. Default: $REDIS_TTL
         -v    Verbose output
 EOF
 }
@@ -70,6 +70,19 @@ parse_args() {
 vecho() {
     test $VERBOSE -eq 1 && echo "$*"
     return 0
+}
+
+load_npmirc() {
+    local config=".npmirc"
+
+    if [ -r "$config" ]; then
+        if egrep -q -v '^#|^[^ ]*=[^;]*' "$config"; then
+            echo "ERROR: $config may only contain KEY=VALUE settings and comments!"
+            exit 2
+        fi
+        . "$config"
+        vecho "- Using configuration from $config"
+    fi
 }
 
 sanitycheck() {
@@ -298,6 +311,9 @@ main() {
     fi
 }
 
+
+# Try to load .npmirc
+load_npmirc
 
 parse_args "$@"
 
