@@ -73,7 +73,7 @@ vecho() {
 }
 
 load_npmirc() {
-    local config=".npmirc"
+    local config="$1"
 
     if [ -r "$config" ]; then
         if egrep -q -v '^#|^[^ ]*=[^;]*' "$config"; then
@@ -313,7 +313,8 @@ main() {
 
 
 # Try to load .npmirc
-load_npmirc
+load_npmirc "$HOME/.npmirc"
+load_npmirc ".npmirc"
 
 parse_args "$@"
 
