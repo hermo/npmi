@@ -24,16 +24,34 @@ surprises.
 ```
 $ npmi -h
 
-NPMI v3.0.0 - a caching 'npm install'
-
+NPMI v4.0.0 - a caching 'npm install'
 Usage: ./npmi [-hcfv]
--h    Display this help
--c    Use specified cache dir: Default $TMPDIR/npmi
+-h    Display this help"
+-c    Use specified cache dir: Default /tmp/npmi
 -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
 -f    Force install from NPM and update cache
--r    Use specified redis server for shared cache
+-r    Use specified Redis server for shared cache
+-t    Specify Redis TTL in seconds. Default: 86400
 -v    Verbose output
+
 ```
+
+# Configuration
+
+NPMI can be configured using a file, *.npmirc* located in the working
+directory.
+
+The file format is KEY=VALUE separated by newlines.
+
+Some options of interest are described below. See the source for more
+exotic options.
+
+Key           | Value
+------------- | -------------
+VERBOSE       | Verbose output if set to "1". Default: "0"
+CACHEDIR      | Where should local file caches be kept. Default: $TMPDIR/npmi
+REDIS_SERVER  | Host/IP for Redis server. Default: "" (Don't use Redis)
+REDIS_TTL     | How many seconds should modules be cached. Default: 86400 (24 h)
 
 # Speed gains
 
