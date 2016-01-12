@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.1.0] - 2016-01-12
+## Added
+- Added support for global configuration file in ~/.npmirc
+
 ## [4.0.0] - 2016-01-12
 ## Added
 - Configuration file support. If an .npmirc file is found in the working
@@ -72,3 +76,4 @@ useful when working with multiple node versions, operating systems etc.
 [3.0.1]: https://github.com/hermo/npmi/compare/v3.0.0...v3.0.1
 [3.0.3]: https://github.com/hermo/npmi/compare/v3.0.1...v3.0.3
 [4.0.0]: https://github.com/hermo/npmi/compare/v3.0.3...v4.0.0
+[4.1.0]: https://github.com/hermo/npmi/compare/v4.0.0...v4.1.0
