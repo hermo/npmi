@@ -13,6 +13,7 @@ VERBOSE=0
 FORCE=0
 CACHE_EXISTING=0
 REDIS_SERVER=""
+REDIS_PORT="6379"
 REDIS_TTL=86400
 REDIS_PREFIX="NPMI4"
 
@@ -146,7 +147,7 @@ fetch_from_redis() {
     local dstfile="$3"
     local tempfile
     tempfile="$(mktemp)"
-    redis-cli --raw -h "$host" GET "$REDIS_PREFIX-$key" > "$tempfile"
+    redis-cli --raw -p "$REDIS_PORT" -h "$host" GET "$REDIS_PREFIX-$key" > "$tempfile"
 
     local templen
     templen="$(wc -c < "$tempfile")"
@@ -155,7 +156,7 @@ fetch_from_redis() {
         mv "$tempfile" "$dstfile"
         vecho "- Redis lookup HIT"
         # "touch" the key to extend it's ttl
-        if redis-cli --raw -h "$host" EXPIRE "$REDIS_PREFIX-$key" "$REDIS_TTL" > /dev/null; then
+        if redis-cli --raw -p "$REDIS_PORT" -h "$host" EXPIRE "$REDIS_PREFIX-$key" "$REDIS_TTL" > /dev/null; then
             return 0
         fi
         echo "ERROR: Could not extend Redis TTL"
@@ -171,7 +172,7 @@ store_to_redis() {
     local host="$1"
     local key="$2"
     local srcfile="$3"
-    if redis-cli -x --raw -h "$host" SETEX "$REDIS_PREFIX-$key" "$REDIS_TTL" < "$srcfile" >/dev/null; then
+    if redis-cli -x --raw -p "$REDIS_PORT" -h "$host" SETEX "$REDIS_PREFIX-$key" "$REDIS_TTL" < "$srcfile" >/dev/null; then
         vecho "- Store to redis OK"
         return 0
         vecho "- Store to redis FAIL"
