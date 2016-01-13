@@ -86,6 +86,10 @@ load_npmirc() {
     fi
 }
 
+hasbin() {
+    which "$1" >/dev/null 2>&1
+}
+
 sanitycheck() {
     if [ ! -d "$CACHEDIR" ]; then
         if ! mkdir "$CACHEDIR"; then
@@ -94,34 +98,48 @@ sanitycheck() {
         fi
     fi
 
-    local bins=(cut tar node npm awk)
+    local bins=(cut tar node npm awk mktemp)
     if [ -n "$REDIS_SERVER" ]; then
         bins+=(redis-cli)
+        # Find 'head' command with support for negative values. This is
+        # used to remove trailing LFs from redis-cli GET output.
+        testhead() {
+            echo test | "$1" -c-1 >/dev/null 2>&1
+        }
+
+        if hasbin "head" && testhead "head"; then
+            CMD_HEAD="head"
+        elif hasbin "ghead" && testhead "ghead"; then
+            CMD_HEAD="ghead"
+        else
+            echo "ERROR: Cannot find 'head' command with support for negative values"
+        fi
     fi
 
     for bin in "${bins[@]}"; do
-        if ! which "$bin" > /dev/null 2>&1 ; then
+        if ! hasbin "$bin"; then
             echo "ERROR: Binary $bin not found"
             exit 1
         fi
     done
 
-    if which "md5sum" > /dev/null 2>&1 ; then
-        MD5SUM="md5sum"
-    elif which "gmd5sum" > /dev/null 2>&1 ; then
-        MD5SUM="gmd5sum"
-    elif which "md5" > /dev/null 2>&1 ; then
-        MD5SUM="md5 -q"
+    if hasbin "md5sum"; then
+        CMD_MD5SUM="md5sum"
+    elif hasbin "gmd5sum"; then
+        CMD_MD5SUM="gmd5sum"
+    elif hasbin "md5"; then
+        CMD_MD5SUM="md5 -q"
     else
         echo "ERROR: md5sum or md5 binary not found"
         exit 1
     fi
+
 }
 
 get_hash() {
     local file="$1"
     if [ -f "$file" ]; then
-        HASH=$("$MD5SUM" "$file" | cut -c1-32)
+        HASH=$("$CMD_MD5SUM" "$file" | cut -c1-32)
     else
         return 1
     fi
@@ -147,7 +165,8 @@ fetch_from_redis() {
     local dstfile="$3"
     local tempfile
     tempfile="$(mktemp)"
-    redis-cli --raw -p "$REDIS_PORT" -h "$host" GET "$REDIS_PREFIX-$key" > "$tempfile"
+    redis-cli --raw -p "$REDIS_PORT" -h "$host" GET "$REDIS_PREFIX-$key" \
+        | $CMD_HEAD -c-1 > "$tempfile"
 
     local templen
     templen="$(wc -c < "$tempfile")"
@@ -156,8 +175,9 @@ fetch_from_redis() {
         mv "$tempfile" "$dstfile"
         vecho "- Redis lookup HIT"
         # "touch" the key to extend it's ttl
-        if redis-cli --raw -p "$REDIS_PORT" -h "$host" EXPIRE "$REDIS_PREFIX-$key" "$REDIS_TTL" > /dev/null; then
-            return 0
+        if redis-cli --raw -p "$REDIS_PORT" -h "$host" \
+            EXPIRE "$REDIS_PREFIX-$key" "$REDIS_TTL" > /dev/null; then
+                return 0
         fi
         echo "ERROR: Could not extend Redis TTL"
         return 2
