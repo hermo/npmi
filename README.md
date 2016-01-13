@@ -52,6 +52,7 @@ VERBOSE       | Verbose output if set to "1". Default: "0"
 CACHEDIR      | Where should local file caches be kept. Default: $TMPDIR/npmi
 REDIS_SERVER  | Host/IP for Redis server. Default: "" (Don't use Redis)
 REDIS_TTL     | How many seconds should modules be cached. Default: 86400 (24 h)
+REDIS_PORT    | What port to use when connecting to Redis. Default: 6379
 
 # Speed gains
 
