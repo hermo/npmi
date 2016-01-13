@@ -81,3 +81,4 @@ useful when working with multiple node versions, operating systems etc.
 [3.0.3]: https://github.com/hermo/npmi/compare/v3.0.1...v3.0.3
 [4.0.0]: https://github.com/hermo/npmi/compare/v3.0.3...v4.0.0
 [4.1.0]: https://github.com/hermo/npmi/compare/v4.0.0...v4.1.0
+[4.2.0]: https://github.com/hermo/npmi/compare/v4.1.0...v4.2.0
