@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.2.1] - 2016-01-13
+## Fixed
+- redis-cli GET xxx always return an extra newline which makes GNU
+  gzip/tar think the cached module data is corrupted. This newline
+  will now be removed when fetching data from the cache.
+
 ## [4.2.0] - 2016-01-13
 ## Added
 - Added REDIS_PORT configuration option
@@ -82,3 +88,4 @@ useful when working with multiple node versions, operating systems etc.
 [4.0.0]: https://github.com/hermo/npmi/compare/v3.0.3...v4.0.0
 [4.1.0]: https://github.com/hermo/npmi/compare/v4.0.0...v4.1.0
 [4.2.0]: https://github.com/hermo/npmi/compare/v4.1.0...v4.2.0
+[4.2.1]: https://github.com/hermo/npmi/compare/v4.2.0...v4.2.1
