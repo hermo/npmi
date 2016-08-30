@@ -139,7 +139,7 @@ sanitycheck() {
 get_hash() {
     local file="$1"
     if [ -f "$file" ]; then
-        HASH=$("$CMD_MD5SUM" "$file" | cut -c1-32)
+        HASH=$($CMD_MD5SUM "$file" | cut -c1-32)
     else
         return 1
     fi
