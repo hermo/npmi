@@ -1,0 +1,32 @@
+.TH NPMI 1
+.SH NAME
+npmi \- locally caching 'npm install'
+.SH SYNOPSIS
+.B npmi
+.IR [OPTIONS]
+.SH DESCRIPTION
+.B npmi
+installs NPM dependencies quickly from a local cache or a Redis server.
+.SH OPTIONS
+.TP
+.BR \-h
+Display this help.
+.TP
+.BR \-c=\fIDIRECTORY\fR
+Use specified cache dir.
+Default is /tmp/npmi.
+.TP
+.BR \-e
+Cache existing node_modules AKA 'Oops I forgot to npmi' mode.
+.TP
+.BR \-f
+Force install from NPM and update cache.
+.TP
+.BR \-r=\fIREDIS_HOST\fR
+Use specified Redis server for shared cache.
+.TP
+.BR \-t=\fIREDIS_TTL\fR
+Specify Redis TTL in seconds. Default is 86400.
+.TP
+.BR \-v
+Verbose output.
