@@ -1,0 +1,45 @@
+.TH NPMIRC 5 "September 2016" "" ""
+.SH "NAME"
+\fBnpmirc\fR \- The npmi config files
+.SH DESCRIPTION
+.P
+npmi gets its config settings from the command line and \fBnpmirc\fP files\.
+.SH FILES
+.P
+The three relevant files are:
+.RS 0
+.IP \(bu 2
+per\-project config file (/path/to/my/project/\.npmirc)
+.IP \(bu 2
+per\-user config file (~/\.npmirc)
+.IP \(bu 2
+global config file (/etc/npmrc)
+
+.P
+All npm config files are an ini\-formatted list of \fBkey=value\fP parameters.
+
+String values should be wrapped in double quotes. eg. KEY="VALUE".
+.P
+
+.SH OPTIONS
+.TP
+.BR CACHEDIR
+Cache directory. Default \fB/tmp/npmi\fR.
+.TP
+.BR VERBOSE
+Verbose output. Default: \fB0\fR.
+.TP
+.BR REDIS_SERVER
+Use Redis server at specified host. Default: "" (Not enabled).
+.TP
+.BR REDIS_PORT
+Use specified port for Redis. Default: \fB6379\fR.
+.TP
+.BR REDIS_TTL
+Cache expiration time in seconds. Default: \fB86400\fR. (24 hours)
+.TP
+.BR REDIS_PREFIX
+Redis cache key prefix. Default: "\fBNPMI4\fR".
+
+.RE
+

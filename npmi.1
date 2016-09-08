@@ -1,4 +1,4 @@
-.TH NPMI 1
+.TH NPMI 1 "September 2016" "" ""
 .SH NAME
 npmi \- locally caching 'npm install'
 .SH SYNOPSIS
@@ -7,6 +7,16 @@ npmi \- locally caching 'npm install'
 .SH DESCRIPTION
 .B npmi
 installs NPM dependencies quickly from a local cache or a Redis server.
+.PP
+This is achieved by hashing a npm-shrinkwrap.json or package.json file
+and storing a tarball containing all dependencies for a given project.
+.PP
+A hash contains the Node.js version used, the platform and a MD5 hash.
+eg. v6.0.0-darwin-x64-ea8df7a03d7de2211f64096cbbff6db6.
+.PP
+A Redis server may also be used to share cached data between computers.
+A shared cache may be useful when a team of developers are sharing
+projects and need to update dependencies often.
 .SH OPTIONS
 .TP
 .BR \-h
@@ -30,3 +40,21 @@ Specify Redis TTL in seconds. Default is 86400.
 .TP
 .BR \-v
 Verbose output.
+
+.SH FILES
+.I /etc/.npmirc
+.RS
+System wide configuration file.
+.RE
+.I $HOME/.npmirc
+.RS
+User specific configuration file.
+.RE
+.I .npmirc
+.RS
+Project specific configuration file.
+.RE
+
+See
+.BR npmirc (5)
+for further details.
