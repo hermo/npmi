@@ -7,7 +7,7 @@ if [[ ! ${TMPDIR+_} ]]; then
     TMPDIR="/tmp"
 fi
 
-readonly VERSION="4.2.3"
+readonly VERSION="4.3.0"
 CACHEDIR="$TMPDIR/npmi"
 VERBOSE=0
 FORCE=0
