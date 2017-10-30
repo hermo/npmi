@@ -92,7 +92,7 @@ hasbin() {
 
 sanitycheck() {
     if [ ! -d "$CACHEDIR" ]; then
-        if ! mkdir "$CACHEDIR"; then
+        if ! mkdir -p "$CACHEDIR"; then
             echo "ERROR: Can't create cache directory $CACHEDIR"
             exit 1
         fi
