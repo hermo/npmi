@@ -36,23 +36,33 @@ Usage: ./npmi [-hcfv]
 
 ```
 
-# Configuration
+# Configuration options
 
-NPMI can be configured using a file, *.npmirc* located in the working
+The following configuration options are available.
+
+Key              | Value
+---------------- | --------------------------
+CACHEDIR         | Local cache directory. Default: `$TMPDIR/npmi`.
+VERBOSE          | Verbose output. Default: `0`
+FORCE            | Force reinstall. Default: `0`
+CACHE_EXISTING   | Cache whatever is currently in node_modules. Default: `0`
+REDIS_SERVER     | Host/IP for Redis server. Default: `""` (Don't use Redis)
+REDIS_PORT       | What port to use when connecting to Redis. Default: `6379`
+REDIS_TTL        | How many seconds should modules be cached. Default: `86400` (24h)
+REDIS_PREFIX     | Key prefix for Redis. Default: `NPMI4`
+
+## Configuration with .npmirc
+
+NPMI can be configured using a file, `.npmirc` located in the working
 directory.
 
-The file format is KEY=VALUE separated by newlines.
+The file format is `KEY=VALUE` separated by newlines.
 
-Some options of interest are described below. See the source for more
-exotic options.
+## Configuration with environment variables
 
-Key           | Value
-------------- | -------------
-VERBOSE       | Verbose output if set to "1". Default: "0"
-CACHEDIR      | Where should local file caches be kept. Default: $TMPDIR/npmi
-REDIS_SERVER  | Host/IP for Redis server. Default: "" (Don't use Redis)
-REDIS_TTL     | How many seconds should modules be cached. Default: 86400 (24 h)
-REDIS_PORT    | What port to use when connecting to Redis. Default: 6379
+All configuration can be given as environment variables if necessary.
+The options are same for both `.npmirc` but are prefixed with `NPMI_`.
+To run NPMI on verbose mode one would use `NPMI_VERBOSE=1 npmi`.
 
 # Speed gains
 
