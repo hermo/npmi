@@ -1,4 +1,4 @@
-.TH NPMI 1 "September 2016" "" ""
+.TH NPMI 1 "October 2017" "" ""
 .SH NAME
 npmi \- locally caching 'npm install'
 .SH SYNOPSIS
@@ -40,6 +40,32 @@ Specify Redis TTL in seconds. Default is 86400.
 .TP
 .BR \-v
 Verbose output.
+
+.SH ENVIRONMENT
+.TP
+.BR NPMI_CACHEDIR
+Local cache directory. Default: $TMPDIR/npmi.
+.TP
+.BR NPMI_VERBOSE
+Verbose output. Default: 0
+.TP
+.BR NPMI_FORCE
+Force reinstall. Default: 0
+.TP
+.BR NPMI_CACHE_EXISTING
+Cache whatever is currently in node_modules. Default: 0
+.TP
+.BR NPMI_REDIS_SERVER
+Host/IP for Redis server. Default: "" (Don't use Redis)
+.TP
+.BR NPMI_REDIS_PORT
+What port to use when connecting to Redis. Default: 6379
+.TP
+.BR NPMI_REDIS_TTL
+How many seconds should modules be cached. Default: 86400 (24h)
+.TP
+.BR NPMI_REDIS_PREFIX
+Key prefix for Redis. Default: "NPMI4"
 
 .SH FILES
 .I /etc/.npmirc
