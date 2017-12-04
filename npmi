@@ -7,7 +7,7 @@ if [[ ! ${TMPDIR+_} ]]; then
     TMPDIR="/tmp"
 fi
 
-readonly VERSION="4.4.0"
+readonly VERSION="4.4.1"
 CACHEDIR=${NPMI_CACHEDIR:-"${TMPDIR}/npmi"}
 VERBOSE=${NPMI_VERBOSE:-0}
 FORCE=${NPMI_FORCE:-0}
@@ -155,7 +155,7 @@ determine_hash() {
 
 remove_modules() {
     if [ -d "node_modules" ]; then
-        rm -rf node_modules
+        rm -rf node_modules/*
     fi
 }
 
