@@ -209,7 +209,7 @@ install_from_cache() {
     fi
 
     if [ -f "$cachefile" ]; then
-        tar xfz "$cachefile"
+        tar -xz --strip-components=1 -C node_modules/ -f "$cachefile"
         if [ $? -eq 0 ]; then
             return 0
         else
