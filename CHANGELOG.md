@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.4.2] - 2017-12-05
+## Fixed
+- Cached modules are extracted inside node_modules/ without attempting
+  to change the directory itself. This allows NPMI to work in an
+  environment where node_modules/ is a mount.
+
 ## [4.4.1] - 2017-12-04
 ## Changed
 - The node_modules directory is not removed when cleaning up, only it's
@@ -119,3 +125,4 @@ useful when working with multiple node versions, operating systems etc.
 [4.3.0]: https://github.com/hermo/npmi/compare/v4.2.3...v4.3.0
 [4.4.0]: https://github.com/hermo/npmi/compare/v4.3.0...v4.4.0
 [4.4.1]: https://github.com/hermo/npmi/compare/v4.4.0...v4.4.1
+[4.4.2]: https://github.com/hermo/npmi/compare/v4.4.1...v4.4.2
