@@ -8,10 +8,11 @@ if [[ ! ${TMPDIR+_} ]]; then
 fi
 
 readonly VERSION="4.4.2"
-CACHEDIR=${NPMI_CACHEDIR:-"${TMPDIR}/npmi"}
+CACHEDIR=${NPMI_CACHEDIR:-${TMPDIR}/npmi}
 VERBOSE=${NPMI_VERBOSE:-0}
 FORCE=${NPMI_FORCE:-0}
 CACHE_EXISTING=${NPMI_CACHE_EXISTING:-0}
+PRECACHE=${PRECACHE:-""}
 REDIS_SERVER=${NPMI_REDIS_SERVER:-""}
 REDIS_PORT=${NPMI_REDIS_PORT:-"6379"}
 REDIS_TTL=${NPMI_REDIS_TTL:-86400}
@@ -25,10 +26,11 @@ usage() {
     cat <<- EOF | format_heredoc
         NPMI v${VERSION} - a caching 'npm install'
         Usage: $0 [-hcfv]
-        -h    Display this help"
+        -h    Display this help
         -c    Use specified cache dir: Default $TMPDIR/npmi
         -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
         -f    Force install from NPM and update cache
+        -p    Run given command before packages are cached
         -r    Use specified Redis server for shared cache
         -t    Specify Redis TTL in seconds. Default: $REDIS_TTL
         -v    Verbose output
@@ -36,7 +38,7 @@ EOF
 }
 
 parse_args() {
-    while getopts 'hc:efvr:t:' OPTION; do
+    while getopts 'hc:efvr:p:t:' OPTION; do
         case $OPTION in
             h)
                 usage
@@ -54,6 +56,9 @@ parse_args() {
                 ;;
             f)
                 FORCE=1
+                ;;
+            p)
+                PRECACHE="$OPTARG"
                 ;;
             v)
                 VERBOSE=1
@@ -232,6 +237,11 @@ install_from_npm() {
     return $?
 }
 
+run_precache_cmd() {
+    ${PRECACHE[@]}
+    return $?
+}
+
 store_to_cache() {
     local cachefile="$1"
 
@@ -258,7 +268,13 @@ main() {
         exit 1
     fi
 
-    local cache_key="$platform-$HASH"
+    determine_precache_hash
+    if [[ -n $PRECACHE_HASH ]]; then
+        local cache_key="$platform-$HASH-$PRECACHE_HASH"
+    else
+        local cache_key="$platform-$HASH"
+    fi
+
     local cache_file="$CACHEDIR/$cache_key.tgz"
     vecho "- HASH ${HASH} determined from ${HASH_SOURCE} (${cache_key})"
 
@@ -309,6 +325,11 @@ main() {
 
     if ! install_from_npm; then
         echo "ERROR: NPM install failed"
+        exit 2
+    fi
+
+    if ! run_precache_cmd; then
+        echo "ERROR: Precache command failed"
         exit 2
     fi
 
