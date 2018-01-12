@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+## Changed
+- Added package-lock.json as the primary file to calcute cache hash from
+
+## Added
+- Added support for precache command that is run before caching packages
+
 ## [4.4.2] - 2017-12-05
 ## Fixed
 - Cached modules are extracted inside node_modules/ without attempting
