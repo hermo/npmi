@@ -145,8 +145,15 @@ get_hash() {
     fi
 }
 
+determine_precache_hash() {
+    PRECACHE_HASH=""
+    if [[ -n "$PRECACHE" ]]; then
+        PRECACHE_HASH=$(echo $PRECACHE | $CMD_MD5SUM | cut -c1-32)
+    fi
+}
+
 determine_hash() {
-    HASH_SOURCES='npm-shrinkwrap.json package.json'
+    HASH_SOURCES='package-lock.json npm-shrinkwrap.json package.json'
 
     for HASH_SOURCE in $HASH_SOURCES; do
         get_hash "$HASH_SOURCE" && break
@@ -247,7 +254,7 @@ main() {
     # Sets HASH, HASH_SOURCE
     determine_hash
     if [[ ! ${HASH+_} ]]; then
-        echo "ERROR: Can't find npm-shrinkwrap.json/package.json"
+        echo "ERROR: Can't find package-lock.json, npm-shrinkwrap.json or package.json"
         exit 1
     fi
 
