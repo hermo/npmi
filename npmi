@@ -25,7 +25,7 @@ format_heredoc() {
 usage() {
     cat <<- EOF | format_heredoc
         NPMI v${VERSION} - a caching 'npm install'
-        Usage: $0 [-hcfv]
+        Usage: $0 [-hcefprtv]
         -h    Display this help
         -c    Use specified cache dir: Default $TMPDIR/npmi
         -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
