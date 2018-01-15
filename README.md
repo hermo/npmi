@@ -1,9 +1,15 @@
 # npmi
 Locally caching 'npm install'. Useful in CI-like situations.
 
-npmi works by hashing npm-shrinkwrap.json / package.json to get a
-reasonably unique id and using that as a cache key.
-The cache key is prefixed with node version, platform and arch.
+npmi works by hashing package-lock.json / npm-shrinkwrap.json / package.json
+to get a reasonably unique id and using that as a cache key.
+
+The cache key is something like
+`v8.9.1-darwin-x64-prod-0a8ca5554ece9332de1bb64096d04a57`.
+
+The cache key is determined from node version, platform, cpu
+architecture, NODE_ENV and the content of one of the package files
+mentioned above.
 
 On the first run npmi will run 'npm install' as usual, storing whatever
 ends up in node_modules to $CACHEDIR/$HASH.tgz.
@@ -24,14 +30,15 @@ surprises.
 ```
 $ npmi -h
 
-NPMI v4.0.0 - a caching 'npm install'
-Usage: ./npmi [-hcfv]
--h    Display this help"
+NPMI v5.0.0 - a caching 'npm install'
+Usage: npmi [-hcefprtv]
+-h    Display this help
 -c    Use specified cache dir: Default /tmp/npmi
 -e    Cache existing node_modules AKA 'Oops I forgot to npmi' mode
 -f    Force install from NPM and update cache
+-p    Run given command before packages are cached
 -r    Use specified Redis server for shared cache
--t    Specify Redis TTL in seconds. Default: 86400
+-t    Specify Redis TTL in seconds. Default: 259200
 -v    Verbose output
 
 ```

@@ -154,7 +154,7 @@ get_hash() {
 determine_precache_hash() {
     PRECACHE_HASH=""
     if [[ -n "$PRECACHE" ]]; then
-        PRECACHE_HASH=$(echo $PRECACHE | $CMD_MD5SUM | cut -c1-32)
+        PRECACHE_HASH=$(echo "$PRECACHE" | $CMD_MD5SUM | cut -c1-32)
     fi
 }
 
@@ -269,11 +269,20 @@ main() {
         exit 1
     fi
 
+    local env
+    env="${NODE_ENV:-0}"
+
+    if [ "$env" == "production" ]; then
+        env="prod"
+    else
+        env="dev"
+    fi
+
     determine_precache_hash
     if [[ -n $PRECACHE_HASH ]]; then
-        local cache_key="$platform-$HASH-$PRECACHE_HASH"
+        local cache_key="$platform-$env-$HASH-$PRECACHE_HASH"
     else
-        local cache_key="$platform-$HASH"
+        local cache_key="$platform-$env-$HASH"
     fi
 
     local cache_file="$CACHEDIR/$cache_key.tgz"

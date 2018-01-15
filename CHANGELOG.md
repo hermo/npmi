@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Changed
 - Added package-lock.json as the primary file to calcute cache hash from
+- Cache checksums now take NODE_ENV into account.
+  If NODE_ENV is "production" the key will contain "-prod" and "-dev" otherwise.
 
 ## Added
 - Added support for precache command that is run before caching packages
