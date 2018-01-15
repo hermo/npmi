@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## Fixed
+- NPMI will now exit properly if a suitable 'head' command cannot be found
+
 ## Changed
 - Added package-lock.json as the primary file to calcute cache hash from
 

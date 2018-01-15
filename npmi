@@ -118,6 +118,7 @@ sanitycheck() {
             CMD_HEAD="ghead"
         else
             echo "ERROR: Cannot find 'head' command with support for negative values"
+            exit 1
         fi
     fi
 
