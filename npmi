@@ -166,10 +166,23 @@ determine_hash() {
     done
 }
 
-remove_modules() {
+clean_modules() {
+    # If there is a node_modules, it needs to be a directory
+    if [ -a "node_modules" ] && [ ! -d "node_modules" ]; then
+        echo "ERROR: node_modules exists and is NOT a directory"
+        exit 2
+    fi
+
+    # Clean up without removing directory
     if [ -d "node_modules" ]; then
         rm -rf node_modules/*
     fi
+
+    # Make sure there IS a node_modules directory
+    if [ ! -d "node_modules" ]; then
+        mkdir "node_modules"
+    fi
+
 }
 
 fetch_from_redis() {
@@ -307,8 +320,8 @@ main() {
     fi
 
     vecho "- Cleaning node_modules..."
-    if ! remove_modules; then
-        echo "ERROR: Cannot remove node_modules"
+    if ! clean_modules; then
+        echo "ERROR: Cannot clean node_modules"
         exit 2
     fi
 

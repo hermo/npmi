@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+## Fixed
+- Fixed bug introduced in v4.4.2 where installation would fail if modules were
+  found in cache but a node_modules directory doesn't already exist
+
 ## [5.0.0]
 ## Fixed
 - NPMI will now exit properly if a suitable 'head' command cannot be found
