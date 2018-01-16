@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [5.0.1]
 ## Fixed
 - Fixed bug introduced in v4.4.2 where installation would fail if modules were
   found in cache but a node_modules directory doesn't already exist
@@ -144,3 +144,4 @@ useful when working with multiple node versions, operating systems etc.
 [4.4.1]: https://github.com/hermo/npmi/compare/v4.4.0...v4.4.1
 [4.4.2]: https://github.com/hermo/npmi/compare/v4.4.1...v4.4.2
 [5.0.0]: https://github.com/hermo/npmi/compare/v4.4.2...v5.0.0
+[5.0.1]: https://github.com/hermo/npmi/compare/v5.0.0...v5.0.1
