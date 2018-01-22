@@ -116,3 +116,19 @@ $ time npmi -v
 ```
 <strong><pre># npmi -v  0.57s user 3.65s system 94% cpu 4.486 total</pre></strong>
 
+
+# Known Issues
+
+Any post-installation script of NPM will NOT get run when installing
+from cache. This includes at least the following:
+* `install`
+* `postinstall`
+
+For instance a `postinstall` block in package.json which does something
+outside of node_modules will only be run on a cache MISS. If it merely creates
+a file in node_modules etc. those will get cached.
+
+
+
+
+
