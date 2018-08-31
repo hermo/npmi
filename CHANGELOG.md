@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.0.0]
+## Added
+- npm modules are installed using 'npm ci' instead of 'npm install' when
+  supported (npm ci was added in npm 5.7.1). The new behaviour might cause npmi
+  to run differently when package-lock.json is not in sync, hence the major
+  version bump. Note that 'npm ci' will only be used with a package-lock.json or
+  npm-shrinkwrap.json file.
+
 ## [5.0.1]
 ## Fixed
 - Fixed bug introduced in v4.4.2 where installation would fail if modules were
@@ -145,3 +153,4 @@ useful when working with multiple node versions, operating systems etc.
 [4.4.2]: https://github.com/hermo/npmi/compare/v4.4.1...v4.4.2
 [5.0.0]: https://github.com/hermo/npmi/compare/v4.4.2...v5.0.0
 [5.0.1]: https://github.com/hermo/npmi/compare/v5.0.0...v5.0.1
+[6.0.0]: https://github.com/hermo/npmi/compare/v5.0.1...v6.0.0

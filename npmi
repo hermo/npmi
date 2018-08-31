@@ -7,7 +7,7 @@ if [[ ! ${TMPDIR+_} ]]; then
     TMPDIR="/tmp"
 fi
 
-readonly VERSION="5.0.1"
+readonly VERSION="6.0.0"
 CACHEDIR=${NPMI_CACHEDIR:-${TMPDIR}/npmi}
 VERBOSE=${NPMI_VERBOSE:-0}
 FORCE=${NPMI_FORCE:-0}
@@ -17,6 +17,9 @@ REDIS_SERVER=${NPMI_REDIS_SERVER:-""}
 REDIS_PORT=${NPMI_REDIS_PORT:-"6379"}
 REDIS_TTL=${NPMI_REDIS_TTL:-86400}
 REDIS_PREFIX=${NPMI_REDIS_PREFIX:-"NPMI4"}
+
+# See npm_ci_check()
+NPM_CI_SUPPORTED=0
 
 format_heredoc() {
     awk 'NR==1 && match($0, /^ +/){n=RLENGTH} {print substr($0, n+1)}'
@@ -142,6 +145,15 @@ sanitycheck() {
 
 }
 
+# See if nstalled NPM supports "npm ci"
+npm_ci_check() {
+    if npm ci --help >/dev/null; then
+        NPM_CI_SUPPORTED=1
+    else
+        NPM_CI_SUPPORTED=0
+    fi
+}
+
 get_hash() {
     local file="$1"
     if [ -f "$file" ]; then
@@ -247,7 +259,11 @@ install_from_cache() {
 }
 
 install_from_npm() {
-    npm install --loglevel error >/dev/null 2>&1
+    if [ "$NPM_CI_SUPPORTED" -eq 1 ] && [ "$HASH_SOURCE" != "package.json" ]; then
+        npm ci --loglevel error >/dev/null 2>&1
+    else
+        npm install --loglevel error >/dev/null 2>&1
+    fi
     return $?
 }
 
@@ -393,5 +409,6 @@ parse_args "$@"
 
 # Make sure everything is good to go
 sanitycheck
+npm_ci_check
 
 main

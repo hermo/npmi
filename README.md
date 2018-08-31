@@ -30,7 +30,7 @@ surprises.
 ```
 $ npmi -h
 
-NPMI v5.0.0 - a caching 'npm install'
+NPMI v6.0.0 - a caching 'npm install'
 Usage: npmi [-hcefprtv]
 -h    Display this help
 -c    Use specified cache dir: Default /tmp/npmi
@@ -72,6 +72,9 @@ The options are same for both `.npmirc` but are prefixed with `NPMI_`.
 To run NPMI on verbose mode one would use `NPMI_VERBOSE=1 npmi`.
 
 # Speed gains
+
+NPM 5.7.1 added 'npm ci' for faster installs. NPMI now uses that for
+installation when possible to speed things up even more.
 
 Even if using a local NPM cache there are often packages which need to
 compile something or download an external dependency.
