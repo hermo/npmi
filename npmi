@@ -263,9 +263,9 @@ install_from_cache() {
 
 install_from_npm() {
     if [ "$NPM_CI_SUPPORTED" -eq 1 ] && [ "$HASH_SOURCE" != "package.json" ]; then
-        npm ci --loglevel error >/dev/null 2>&1
+        npm ci --loglevel error --progress false 2>&1 >/dev/null
     else
-        npm install --loglevel error >/dev/null 2>&1
+        npm install --loglevel error --progress false 2>&1 >/dev/null
     fi
     return $?
 }
@@ -365,8 +365,8 @@ main() {
         vecho "- FORCE: Installing modules from NPM"
     fi
 
-    if ! install_from_npm; then
-        echo "ERROR: NPM install failed"
+    if ! OUTPUT="$(install_from_npm)"; then
+        echo -e "ERROR: NPM install failed. NPM log follows:\\n$OUTPUT"
         exit 2
     fi
 
