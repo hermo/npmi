@@ -72,6 +72,9 @@ parse_args() {
             t)
                 REDIS_TTL="$OPTARG"
                 ;;
+            *)
+                echo "ERROR: Invalid command line option(s) given"
+                exit 1
         esac
     done
 }
