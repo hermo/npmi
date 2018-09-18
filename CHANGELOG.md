@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [6.2.0] - 2018-09-18
 ## Added
 - The USE_NPM_CI option can be used to force `npm install` when `npm ci` is the
   default
@@ -167,3 +167,4 @@ useful when working with multiple node versions, operating systems etc.
 [5.0.1]: https://github.com/hermo/npmi/compare/v5.0.0...v5.0.1
 [6.0.0]: https://github.com/hermo/npmi/compare/v5.0.1...v6.0.0
 [6.1.0]: https://github.com/hermo/npmi/compare/v6.0.0...v6.1.0
+[6.2.0]: https://github.com/hermo/npmi/compare/v6.1.0...v6.2.0
