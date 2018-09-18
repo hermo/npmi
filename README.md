@@ -57,6 +57,8 @@ REDIS_SERVER     | Host/IP for Redis server. Default: `""` (Don't use Redis)
 REDIS_PORT       | What port to use when connecting to Redis. Default: `6379`
 REDIS_TTL        | How many seconds should modules be cached. Default: `86400` (24h)
 REDIS_PREFIX     | Key prefix for Redis. Default: `NPMI4`
+USE_NPM_CI       | Use `npm ci` when available. Default: `1`
+
 
 ## Configuration with .npmirc
 
@@ -75,6 +77,8 @@ To run NPMI on verbose mode one would use `NPMI_VERBOSE=1 npmi`.
 
 NPM 5.7.1 added 'npm ci' for faster installs. NPMI now uses that for
 installation when possible to speed things up even more.
+If you want to use the classic 'npm install' method, see the USE_NPM_CI
+configuration option.
 
 Even if using a local NPM cache there are often packages which need to
 compile something or download an external dependency.

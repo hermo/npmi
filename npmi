@@ -17,6 +17,7 @@ REDIS_SERVER=${NPMI_REDIS_SERVER:-""}
 REDIS_PORT=${NPMI_REDIS_PORT:-"6379"}
 REDIS_TTL=${NPMI_REDIS_TTL:-86400}
 REDIS_PREFIX=${NPMI_REDIS_PREFIX:-"NPMI4"}
+USE_NPM_CI=${NPMI_USE_NPM_CI:-1}
 
 # See npm_ci_check()
 NPM_CI_SUPPORTED=0
@@ -262,7 +263,7 @@ install_from_cache() {
 }
 
 install_from_npm() {
-    if [ "$NPM_CI_SUPPORTED" -eq 1 ] && [ "$HASH_SOURCE" != "package.json" ]; then
+    if [ "$USE_NPM_CI" -eq 1 ] && [ "$NPM_CI_SUPPORTED" -eq 1 ] && [ "$HASH_SOURCE" != "package.json" ]; then
         npm ci --loglevel error --progress false 2>&1 >/dev/null
     else
         npm install --loglevel error --progress false 2>&1 >/dev/null

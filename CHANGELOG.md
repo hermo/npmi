@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+## Added
+- The USE_NPM_CI option can be used to force `npm install` when `npm ci` is the
+  default
+
 ## [6.1.0]
 ## Fixed
 - NPMI will abort when given invalid command line options
