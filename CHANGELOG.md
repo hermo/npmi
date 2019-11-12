@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.2.1] - 2019-11-12
+## Fixed
+- Add `--dev` flag for npm when NODE_ENV=development to work around an apparent
+  bug in npm
+
 ## [6.2.0] - 2018-09-18
 ## Added
 - The USE_NPM_CI option can be used to force `npm install` when `npm ci` is the
@@ -168,3 +173,4 @@ useful when working with multiple node versions, operating systems etc.
 [6.0.0]: https://github.com/hermo/npmi/compare/v5.0.1...v6.0.0
 [6.1.0]: https://github.com/hermo/npmi/compare/v6.0.0...v6.1.0
 [6.2.0]: https://github.com/hermo/npmi/compare/v6.1.0...v6.2.0
+[6.2.1]: https://github.com/hermo/npmi/compare/v6.2.0...v6.2.1
