@@ -264,7 +264,16 @@ install_from_cache() {
 
 install_from_npm() {
     if [ "$USE_NPM_CI" -eq 1 ] && [ "$NPM_CI_SUPPORTED" -eq 1 ] && [ "$HASH_SOURCE" != "package.json" ]; then
-        npm ci --loglevel error --progress false 2>&1 >/dev/null
+        local env
+        env="${NODE_ENV:-0}"
+
+        # Workaround for an npm issue where it doesn't properly
+        # recognize NODE_ENV=development and installs production deps
+        if [ "$env" == "development" ]; then
+            npm ci --dev --loglevel error --progress false 2>&1 >/dev/null
+        else
+            npm ci --loglevel error --progress false 2>&1 >/dev/null
+        fi
     else
         npm install --loglevel error --progress false 2>&1 >/dev/null
     fi
